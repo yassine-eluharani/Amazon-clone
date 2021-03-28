@@ -1,11 +1,25 @@
 import React from 'react'
 import styled from 'styled-components'
+import {db} from './firebase'
 
 function CartItem({id , item}) {
     let options =[];
     for (let i= 1; i<Math.max(item.quantity + 1,20); i++){
         options.push(<option value={i}>Qty: {i}</option>)
+    } 
+
+
+    const changeQunatity = (newQuantity) =>{
+        db.collection('cartitem').doc(id).update({
+            quantity: parseInt(newQuantity)
+        })
     }
+
+    const deleteItem = (e) =>{
+        e.preventDefault()
+        db.collection('cartitem').doc(id).delete();
+    }
+
     return (
         <Container>
             <ImageContainer>
@@ -18,11 +32,18 @@ function CartItem({id , item}) {
                 </CartItemTop>
                 <CartItemBottom>
                     <CartItemQuantity>
-                        <select value={item.quantity}>
+                        <select 
+                            value={item.quantity}
+                            onChange={(e) => changeQunatity(e.target.value)}
+                        >
                             {options}
                         </select>                        
                     </CartItemQuantity>
-                    <CartItemDelete>Delete</CartItemDelete>
+                    <CartItemDelete
+                        onClick={deleteItem}
+                    >
+                        Delete
+                    </CartItemDelete>
                 </CartItemBottom>
             </CartItemInfo>
             <CartItemPrice>{item.price}</CartItemPrice>
